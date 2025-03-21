@@ -3,8 +3,10 @@
 #include <iostream>
 #include <ostream>
 #include <sstream>
+#include <ctime>
 #include <string>
 #include <vector>
+#include <openssl/sha.h>
 #include "utils.h"
 #include "commit.h"
 
@@ -58,3 +60,37 @@ std::string create_tree_object() {
     return tree_hash;
 }
 
+std::string construct_commit_obj(
+    const std::string &tree_hash,
+    const std::string &parent_commit_hash,
+    const std::string &commit_message
+) {
+    time_t now;
+    time(&now);
+    char* timestamp = ctime(&now);
+
+    std::string commit_data = "parent " + parent_commit_hash + "\n";
+
+    if (!parent_commit_hash.empty()) {
+        commit_data += "parent " + parent_commit_hash + "\n";
+    }
+
+    commit_data += std::string(timestamp) + " +0000\n";
+    commit_data += "\n" + commit_message;
+
+    std::string commit_content = "commit " + std::to_string(commit_data.size()) + "\0" + commit_data;
+    std::string commit_hash = sha1(commit_content);
+
+    std::string object_dir = ".git/objects/" + commit_hash.substr(0, 2);
+    std::string object_file = object_dir + "/" + commit_hash.substr(2); 
+
+    fs::create_directories(object_dir);
+
+    std::ofstream out_file(object_file, std::ios::binary);
+    if (out_file.is_open()) {
+        out_file << commit_data;
+        out_file.close();
+    }
+
+    return commit_hash;
+}

@@ -6,10 +6,12 @@
 
 void create_dir(const std::string& path);
 void write_file(const std::string& path, const std::string& content);
-std::vector<std::string> list_files(const std::string& dir);
 void store_blob(const std::string& content, const std::string& hash);
+void update_index(const std::string& file_path, const std::string& file_hash);
+std::vector<std::string> list_files(const std::string& dir);
 std::string compute_hash(const std::string& file_path);
 std::string sha1(const std::string data);
-void update_index(const std::string& file_path, const std::string& file_hash);
+std::string get_parent_commit_hash(const std::string &commit_hash);
+bool is_first_commit();
 
 #endif

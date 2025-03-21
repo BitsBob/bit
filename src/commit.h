@@ -13,6 +13,6 @@ struct TreeEntry {
 
 std::vector<TreeEntry> read_index();
 std::string create_tree_object();
-std::string create_tree_object();
+std::string construct_commit_obj(const std::string &tree_hash, const std::string &parent_commit_hash, const std::string &commit_message);
 
 #endif

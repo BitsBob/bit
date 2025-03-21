@@ -71,3 +71,39 @@ std::vector<std::string> list_files(const std::string& dir) {
     }
     return files;
 }
+
+std::string get_parent_commit_hash(const std::string &commit_hash) {
+    std::string commit_file_path = ".bit/objects/" + commit_hash.substr(0, 2) + "/" + commit_hash.substr(2);
+    
+    std::ifstream commit_file(commit_file_path);
+    if (!commit_file.is_open()) {
+        std::cerr << "E: Commit file not found!" << std::endl;
+        return "";
+    }
+
+    std::string line;
+    std::string parent_commit_hash;
+
+    while (std::getline(commit_file, line)) {
+        if (line.find("parent") != std::string::npos) {
+            parent_commit_hash = line.substr(7);
+            break;
+        }
+    }
+
+    return parent_commit_hash;
+}
+
+bool is_first_commit() {
+    // Check if .git/objects is empty
+    fs::path objects_dir(".git/objects");
+    if (fs::exists(objects_dir) && fs::is_directory(objects_dir)) {
+        for (const auto &entry : fs::directory_iterator(objects_dir)) {
+            // If there is at least one object file, it's not the first commit
+            return false;
+        }
+    }
+
+    // If no objects exist, it's the first commit
+    return true;
+}
