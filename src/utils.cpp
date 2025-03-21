@@ -47,9 +47,20 @@ void write_file(const std::string& path, const std::string& content) {
     if (file) {
         file << content;
     } else {
-        std::cerr << "Error: Could not create file " << path << "\n";
+        std::cerr << "E: Could not create file " << path << "\n";
     }
 }
+
+void update_index(const std::string& file_path, const std::string& file_hash) {
+    std::ofstream index_file(".git/index", std::ios::app);
+    if (!index_file) {
+        std::cerr << "E: Could not open .git/index for writing\n";
+        return;
+    }
+
+    index_file << file_path << " " << file_hash << "\n";
+}
+
 
 std::vector<std::string> list_files(const std::string& dir) {
     std::vector<std::string> files;

@@ -2,7 +2,7 @@
 #include "utils.h"
 
 void init(const std::string& path) {
-    std::string bit_dir = path + "/.git";
+    std::string bit_dir = path + "/.bit";
 
     create_dir(bit_dir);
     create_dir(bit_dir + "/objects");

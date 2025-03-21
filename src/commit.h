@@ -1,0 +1,18 @@
+#ifndef COMMIT_H
+#define COMMIT_H
+
+#include <vector>
+#include <string>
+
+struct TreeEntry {
+    std::string mode;
+    std::string type;
+    std::string sha1;
+    std::string name;
+};
+
+std::vector<TreeEntry> read_index();
+std::string create_tree_object();
+std::string create_tree_object();
+
+#endif
