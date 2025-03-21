@@ -1,4 +1,3 @@
-#include "commit.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -7,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "utils.h"
+#include "commit.h"
 
 namespace fs = std::filesystem;
 
@@ -57,3 +57,4 @@ std::string create_tree_object() {
 
     return tree_hash;
 }
+
