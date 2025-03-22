@@ -99,3 +99,4 @@ std::string construct_commit_obj(
 
     return commit_hash;
 }
+

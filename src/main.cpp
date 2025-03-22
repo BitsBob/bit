@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <cstring>
+#include <ostream>
 #include <string>
 #include "init.h"
 #include "add.h"
@@ -43,9 +44,14 @@ int main(int argc, char* argv[]) {
 
             std::string obj = construct_commit_obj(tree_hash, parent_commit_hash, commit_message);
             std::cout << "Commit created with object: " << obj << std::endl;
-        } else if  (std::string(argv[1]) != "branch") {
+        } else if (std::string(argv[1]) != "branch") {
             list_branches();
-
+        } else if (std::string(argv[1]) != "checkout" && std::string(argv[1]) != "switch") {
+            if (argc < 3) {
+                std::cerr << "E: Too few arguments" << std::endl;
+            } else {
+                switch_branch(argv[2]);
+            }
         } else {
             std::cerr << "E: Unknown command '" << argv[1] << "'\n";
             return 1;

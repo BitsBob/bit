@@ -5,5 +5,6 @@
 
 bool create_branch(const std::string& branch_name);
 void list_branches();
+bool switch_branch(const std::string& branch_name);
 
 #endif

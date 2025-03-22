@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include "src/utils.h"
+#include "utils.h"
 #include "utils.h"
 
 namespace fs = std::filesystem;
@@ -32,4 +32,55 @@ void list_branches() {
     for (const auto& entry : fs::directory_iterator(refs_path)) {
         std::cout << entry.path().filename().string() << "\n";
     }
+}
+
+bool switch_branch(const std::string& branch_name) {
+    std::string branch_path = ".bit/refs/heads/" + branch_name;
+    if (!std::filesystem::exists(branch_path)) {
+        std::cerr << "E: Branch does not exist.\n";
+        return false;
+    }
+    
+    std::ofstream head_file(".bit/HEAD");
+    if (!head_file) {
+        std::cerr << "E: Failed to update HEAD.\n";
+        return false;
+    }
+    
+    head_file << "ref: refs/heads/" << branch_name << "\n";
+    head_file.close();
+    std::cout << "Switched to branch '" << branch_name << "'\n";
+    return true;
+}
+
+bool update_head_to_commit(const std::string& commit_hash) {
+    // Open the .git/HEAD file for writing
+    std::ofstream head_file(".git/HEAD");
+    if (!head_file) {
+        std::cerr << "Error: Cannot open .git/HEAD.\n";
+        return false;
+    }
+
+    // Write the commit hash directly to HEAD (detached state)
+    head_file << commit_hash << "\n";
+    head_file.close();
+
+    std::cout << "Updated HEAD to commit hash: " << commit_hash << "\n";
+    return true;
+}
+
+bool update_head_to_branch(const std::string& branch_name) {
+    std::string branch_ref = "ref: refs/heads/" + branch_name;
+
+    std::ofstream head_file(".bit/HEAD");
+    if (!head_file) {
+        std::cerr << "E: Cannot open .git/HEAD.\n";
+        return false;
+    }
+
+    head_file << branch_ref << "\n";
+    head_file.close();
+
+    std::cout << "Updated HEAD to branch: " << branch_name << "\n";
+    return true;
 }
