@@ -1,6 +1,7 @@
 #include <iostream>
 #include <filesystem>
 #include <openssl/sha.h>
+#include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -27,7 +28,7 @@ std::string compute_hash(const std::string& file_path) {
 }
 
 void store_blob(const std::string& content, const std::string& hash) {
-    std::string object_dir = ".git/objects/" + hash.substr(0, 2);
+    std::string object_dir = ".bit/objects/" + hash.substr(0, 2);
     std::string object_file = object_dir + "/" + hash.substr(2);
 
     std::filesystem::create_directories(object_dir);
@@ -72,38 +73,30 @@ std::vector<std::string> list_files(const std::string& dir) {
     return files;
 }
 
-std::string get_parent_commit_hash(const std::string &commit_hash) {
-    std::string commit_file_path = ".bit/objects/" + commit_hash.substr(0, 2) + "/" + commit_hash.substr(2);
-    
-    std::ifstream commit_file(commit_file_path);
-    if (!commit_file.is_open()) {
-        std::cerr << "E: Commit file not found!" << std::endl;
+std::string get_latest_commit_from_head() {
+    std::ifstream head_file(".git/HEAD");
+    if (!head_file) {
+        std::cerr << "E: Cannot open .git/HEAD. Not a Git repository?\n";
         return "";
     }
 
-    std::string line;
-    std::string parent_commit_hash;
+    std::string head_content;
+    std::getline(head_file, head_content);
+    head_file.close();
 
-    while (std::getline(commit_file, line)) {
-        if (line.find("parent") != std::string::npos) {
-            parent_commit_hash = line.substr(7);
-            break;
+    if (head_content.rfind("ref: ", 0) == 0) {
+        std::string branch_ref = head_content.substr(5);
+        std::ifstream branch_file(".bit/" + branch_ref);
+        if (!branch_file) {
+            std::cerr << "E: Cannot open " << branch_ref << "\n";
+            return "";
         }
+
+        std::string commit_hash;
+        std::getline(branch_file, commit_hash);
+        branch_file.close();
+
+        return commit_hash;
     }
-
-    return parent_commit_hash;
-}
-
-bool is_first_commit() {
-    // Check if .git/objects is empty
-    fs::path objects_dir(".git/objects");
-    if (fs::exists(objects_dir) && fs::is_directory(objects_dir)) {
-        for (const auto &entry : fs::directory_iterator(objects_dir)) {
-            // If there is at least one object file, it's not the first commit
-            return false;
-        }
-    }
-
-    // If no objects exist, it's the first commit
-    return true;
+    return head_content; 
 }

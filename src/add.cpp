@@ -9,7 +9,7 @@ void add(const std::string& path) {
 
     for (const std::string& file : files) {
         std::string hash = compute_hash(file);
-        std::ifstream f(".git/index");
+        std::ifstream f(".bit/index");
         std::string line, existing_hash;
         bool already_staged = false;
 

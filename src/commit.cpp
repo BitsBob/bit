@@ -14,7 +14,7 @@ namespace fs = std::filesystem;
 
 std::vector<TreeEntry> read_index() {
     std::vector<TreeEntry> entries;
-    std::ifstream index_file(".git/index");
+    std::ifstream index_file(".bit/index");
 
     if (!index_file.is_open()) {
         std::cerr << "E: .git/index not found!" << std::endl;
@@ -32,6 +32,8 @@ std::vector<TreeEntry> read_index() {
             entries.push_back({mode, type, sha1, name});
         }
     }
+
+    return entries;
 }
 
 std::string create_tree_object() {
@@ -47,7 +49,7 @@ std::string create_tree_object() {
     std::string tree_hash = sha1("tree " + std::to_string(tree_content.size()) + "\0" + tree_content);
 
     // Store the tree object in .git/objects/
-    std::string object_dir = ".git/objects/" + tree_hash.substr(0, 2);
+    std::string object_dir = ".bit/objects/" + tree_hash.substr(0, 2);
     std::string object_file = object_dir + "/" + tree_hash.substr(2);
 
     fs::create_directories(object_dir);
@@ -81,10 +83,13 @@ std::string construct_commit_obj(
     std::string commit_content = "commit " + std::to_string(commit_data.size()) + "\0" + commit_data;
     std::string commit_hash = sha1(commit_content);
 
-    std::string object_dir = ".git/objects/" + commit_hash.substr(0, 2);
+    std::string object_dir = ".bit/objects/" + commit_hash.substr(0, 2);
     std::string object_file = object_dir + "/" + commit_hash.substr(2); 
 
     fs::create_directories(object_dir);
+
+    std::ofstream file(".bit/HEAD", std::ios::trunc);
+    write_file("./bit/HEAD", commit_hash);
 
     std::ofstream out_file(object_file, std::ios::binary);
     if (out_file.is_open()) {

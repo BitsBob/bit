@@ -5,6 +5,8 @@
 #include "init.h"
 #include "add.h"
 #include "commit.h"
+#include "utils.h"
+#include "head.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -37,14 +39,13 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
 
-            std::string parent_commit_hash = "";
-            if (!is_first_commit()) {
-                parent_commit_hash = get_parent_commit_hash(latest_commit_hash);
-            }
+            std::string parent_commit_hash = get_last_commit();
 
-            // Construct the commit object
             std::string obj = construct_commit_obj(tree_hash, parent_commit_hash, commit_message);
             std::cout << "Commit created with object: " << obj << std::endl;
+        } else if  (std::string(argv[1]) != "branch") {
+            list_branches();
+
         } else {
             std::cerr << "E: Unknown command '" << argv[1] << "'\n";
             return 1;
